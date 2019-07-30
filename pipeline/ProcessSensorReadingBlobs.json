@@ -265,7 +265,7 @@
 											"type": "Expression"
 										},
 										"dlsBlobName": {
-											"value": "@{item().Name}",
+											"value": "@{item().BlobName}",
 											"type": "Expression"
 										}
 									}
@@ -302,7 +302,7 @@
 								"storedProcedureParameters": {
 									"dlsLocation": {
 										"value": {
-											"value": "@concat(variables('dlsPath'), '/', item().Name)",
+											"value": "@concat(variables('dlsPath'), '/', item().BlobName)",
 											"type": "Expression"
 										},
 										"type": "String"
