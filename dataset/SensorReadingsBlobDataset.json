@@ -1,0 +1,58 @@
+{
+	"name": "SensorReadingsBlobDataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageConnection",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"blobPath": {
+				"type": "string"
+			},
+			"blobName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureBlob",
+		"structure": [
+			{
+				"name": "Region",
+				"type": "String"
+			},
+			{
+				"name": "Plant",
+				"type": "String"
+			},
+			{
+				"name": "DeviceId",
+				"type": "Int32"
+			},
+			{
+				"name": "Temperature",
+				"type": "Int32"
+			},
+			{
+				"name": "Humidity",
+				"type": "Int32"
+			},
+			{
+				"name": "RecordedTime",
+				"type": "DateTime"
+			}
+		],
+		"typeProperties": {
+			"format": {
+				"type": "JsonFormat"
+			},
+			"fileName": {
+				"value": "@dataset().blobName",
+				"type": "Expression"
+			},
+			"folderPath": {
+				"value": "@dataset().blobPath",
+				"type": "Expression"
+			}
+		}
+	}
+}
