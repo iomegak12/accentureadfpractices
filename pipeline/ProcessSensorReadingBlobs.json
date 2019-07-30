@@ -22,7 +22,8 @@
 					"dataset": {
 						"referenceName": "ProcessableBlobsDataset",
 						"type": "DatasetReference"
-					}
+					},
+					"firstRowOnly": false
 				}
 			}
 		],
