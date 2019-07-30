@@ -77,6 +77,123 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "Process Sensor Readings to SQL DW",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set Blob Name",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BlobSource",
+									"recursive": false
+								},
+								"sink": {
+									"type": "SqlDWSink",
+									"allowPolyBase": true,
+									"polyBaseSettings": {
+										"rejectValue": 0,
+										"rejectType": "value",
+										"useTypeDefault": true
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "Region"
+											},
+											"sink": {
+												"name": "Region",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "Plant"
+											},
+											"sink": {
+												"name": "Plant",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "DeviceId"
+											},
+											"sink": {
+												"name": "DeviceId",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"name": "Temperature"
+											},
+											"sink": {
+												"name": "Temperature",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"name": "Humidity"
+											},
+											"sink": {
+												"name": "Humidity",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"name": "RecordedTime"
+											},
+											"sink": {
+												"name": "RecordedTime",
+												"type": "DateTime"
+											}
+										}
+									]
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SensorReadingsBlobDataset",
+									"type": "DatasetReference",
+									"parameters": {
+										"blobPath": {
+											"value": "@variables('blobPath')",
+											"type": "Expression"
+										},
+										"blobName": {
+											"value": "@variables('blobName')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ProcessedRecordsDWDataset",
+									"type": "DatasetReference"
+								}
+							]
 						}
 					]
 				}
