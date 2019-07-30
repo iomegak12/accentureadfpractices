@@ -6,30 +6,6 @@
 			"type": "string",
 			"metadata": "Data Factory Name",
 			"defaultValue": "iomegadatafactory"
-		},
-		"AzureSQLConnection_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSQLConnection'"
-		},
-		"AzureSQLDWConnection_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureSQLDWConnection'"
-		},
-		"AzureBlobStorageConnection_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorageConnection'"
-		},
-		"AzureKVConnection_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://iomegakv.vault.azure.net/"
-		},
-		"SensorReadingsBlobDataset_properties_typeProperties_fileName": {
-			"type": "string",
-			"defaultValue": "@dataset().blobName"
-		},
-		"SensorReadingsBlobDataset_properties_typeProperties_folderPath": {
-			"type": "string",
-			"defaultValue": "@dataset().blobPath"
 		}
 	},
 	"variables": {
@@ -61,8 +37,7 @@
 							},
 							"dataset": {
 								"referenceName": "ProcessableBlobsDataset",
-								"type": "DatasetReference",
-								"parameters": {}
+								"type": "DatasetReference"
 							},
 							"firstRowOnly": false
 						}
@@ -227,8 +202,7 @@
 									"outputs": [
 										{
 											"referenceName": "ProcessedRecordsDWDataset",
-											"type": "DatasetReference",
-											"parameters": {}
+											"type": "DatasetReference"
 										}
 									]
 								}
@@ -247,86 +221,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ProcessableBlobsDataset')]",
 				"[concat(variables('factoryId'), '/datasets/SensorReadingsBlobDataset')]",
 				"[concat(variables('factoryId'), '/datasets/ProcessedRecordsDWDataset')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ProcessableBlobsDataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSQLConnection",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSQLConnection')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureKVConnection')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('AzureKVConnection_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSQLConnection')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureSQLConnection_connectionString')]",
-					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKVConnection",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "sqlpassword"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKVConnection')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSQLDWConnection')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDW",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureSQLDWConnection_connectionString')]",
-					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKVConnection",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "sqlpassword"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKVConnection')]"
 			]
 		},
 		{
@@ -373,21 +269,6 @@
 				],
 				"typeProperties": {
 					"tableName": "[[dbo].[SensorReadings]"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSQLDWConnection')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureBlobStorageConnection')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureBlobStorageConnection_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -442,18 +323,16 @@
 						"type": "JsonFormat"
 					},
 					"fileName": {
-						"value": "[parameters('SensorReadingsBlobDataset_properties_typeProperties_fileName')]",
+						"value": "@dataset().blobName",
 						"type": "Expression"
 					},
 					"folderPath": {
-						"value": "[parameters('SensorReadingsBlobDataset_properties_typeProperties_folderPath')]",
+						"value": "@dataset().blobPath",
 						"type": "Expression"
 					}
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageConnection')]"
-			]
+			"dependsOn": []
 		}
 	]
 }

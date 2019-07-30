@@ -7,13 +7,29 @@
 			"metadata": "Data Factory Name",
 			"defaultValue": "iomegadatafactory"
 		},
+		"AzureBlobStorageConnection_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorageConnection'"
+		},
 		"AzureSQLConnection_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSQLConnection'"
 		},
+		"AzureSQLDWConnection_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSQLDWConnection'"
+		},
 		"AzureKVConnection_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://iomegakv.vault.azure.net/"
+		},
+		"SensorReadingsBlobDataset_properties_typeProperties_fileName": {
+			"type": "string",
+			"defaultValue": "@dataset().blobName"
+		},
+		"SensorReadingsBlobDataset_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "@dataset().blobPath"
 		}
 	},
 	"variables": {
@@ -29,6 +45,19 @@
 				"type": "AzureKeyVault",
 				"typeProperties": {
 					"baseUrl": "[parameters('AzureKVConnection_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorageConnection')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorageConnection_connectionString')]"
 				}
 			},
 			"dependsOn": []
@@ -57,6 +86,92 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSQLDWConnection')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSQLDWConnection_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKVConnection",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "sqlpassword"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureKVConnection')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SensorReadingsBlobDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorageConnection",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"blobPath": {
+						"type": "string"
+					},
+					"blobName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureBlob",
+				"structure": [
+					{
+						"name": "Region",
+						"type": "String"
+					},
+					{
+						"name": "Plant",
+						"type": "String"
+					},
+					{
+						"name": "DeviceId",
+						"type": "Int32"
+					},
+					{
+						"name": "Temperature",
+						"type": "Int32"
+					},
+					{
+						"name": "Humidity",
+						"type": "Int32"
+					},
+					{
+						"name": "RecordedTime",
+						"type": "DateTime"
+					}
+				],
+				"typeProperties": {
+					"format": {
+						"type": "JsonFormat"
+					},
+					"fileName": {
+						"value": "[parameters('SensorReadingsBlobDataset_properties_typeProperties_fileName')]",
+						"type": "Expression"
+					},
+					"folderPath": {
+						"value": "[parameters('SensorReadingsBlobDataset_properties_typeProperties_folderPath')]",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorageConnection')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ProcessableBlobsDataset')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -72,6 +187,56 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureSQLConnection')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ProcessedRecordsDWDataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSQLDWConnection",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "Region",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Plant",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DeviceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Temperature",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "Humidity",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "RecordedTime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"tableName": "[[dbo].[SensorReadings]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSQLDWConnection')]"
 			]
 		},
 		{
@@ -156,6 +321,119 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "Process Sensor Readings to SQL DW",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Set Blob Name",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BlobSource",
+											"recursive": false
+										},
+										"sink": {
+											"type": "SqlDWSink",
+											"allowPolyBase": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"name": "Region"
+													},
+													"sink": {
+														"name": "Region",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"name": "Plant"
+													},
+													"sink": {
+														"name": "Plant",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"name": "DeviceId"
+													},
+													"sink": {
+														"name": "DeviceId",
+														"type": "Int32"
+													}
+												},
+												{
+													"source": {
+														"name": "Temperature"
+													},
+													"sink": {
+														"name": "Temperature",
+														"type": "Int32"
+													}
+												},
+												{
+													"source": {
+														"name": "Humidity"
+													},
+													"sink": {
+														"name": "Humidity",
+														"type": "Int32"
+													}
+												},
+												{
+													"source": {
+														"name": "RecordedTime"
+													},
+													"sink": {
+														"name": "RecordedTime",
+														"type": "DateTime"
+													}
+												}
+											]
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SensorReadingsBlobDataset",
+											"type": "DatasetReference",
+											"parameters": {
+												"blobPath": {
+													"value": "@variables('blobPath')",
+													"type": "Expression"
+												},
+												"blobName": {
+													"value": "@variables('blobName')",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ProcessedRecordsDWDataset",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
 								}
 							]
 						}
@@ -172,7 +450,9 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/ProcessableBlobsDataset')]"
+				"[concat(variables('factoryId'), '/datasets/ProcessableBlobsDataset')]",
+				"[concat(variables('factoryId'), '/datasets/SensorReadingsBlobDataset')]",
+				"[concat(variables('factoryId'), '/datasets/ProcessedRecordsDWDataset')]"
 			]
 		}
 	]

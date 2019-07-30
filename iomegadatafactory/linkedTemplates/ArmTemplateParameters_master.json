@@ -8,8 +8,20 @@
 		"AzureSQLConnection_connectionString": {
 			"value": ""
 		},
+		"AzureSQLDWConnection_connectionString": {
+			"value": ""
+		},
+		"AzureBlobStorageConnection_connectionString": {
+			"value": ""
+		},
 		"AzureKVConnection_properties_typeProperties_baseUrl": {
 			"value": "https://iomegakv.vault.azure.net/"
+		},
+		"SensorReadingsBlobDataset_properties_typeProperties_fileName": {
+			"value": "@dataset().blobName"
+		},
+		"SensorReadingsBlobDataset_properties_typeProperties_folderPath": {
+			"value": "@dataset().blobPath"
 		},
 		"containerUri": {
 			"value": ""
