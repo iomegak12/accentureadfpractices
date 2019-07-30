@@ -265,7 +265,7 @@
 											"type": "Expression"
 										},
 										"dlsBlobName": {
-											"value": "@{Item().Name}",
+											"value": "@{item().Name}",
 											"type": "Expression"
 										}
 									}
