@@ -205,7 +205,7 @@
 							"typeProperties": {
 								"variableName": "dlsPath",
 								"value": {
-									"value": "@concat('/regions/india/', formatDateTime(utcnow(), 'yyyy/MM/dd/hh/mm/ss'))",
+									"value": "@concat('/processedblobs/regions/india/', formatDateTime(utcnow(), 'yyyy/MM/dd/hh/mm/ss'))",
 									"type": "Expression"
 								}
 							}
