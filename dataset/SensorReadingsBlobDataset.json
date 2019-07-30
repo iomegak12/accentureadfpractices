@@ -38,7 +38,7 @@
 			},
 			{
 				"name": "RecordedTime",
-				"type": "DateTime"
+				"type": "String"
 			}
 		],
 		"typeProperties": {
