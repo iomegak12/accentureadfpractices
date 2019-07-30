@@ -86,8 +86,71 @@
 							},
 							"firstRowOnly": false
 						}
+					},
+					{
+						"name": "Loop Processable Blobs",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup Processable Blobs",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup Processable Blobs').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Set Blob Path",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "blobPath",
+										"value": {
+											"value": "@substring(item().Path, 0, indexof(item().path, item().BlobName))",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set Blob Name",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Set Blob Path",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "blobName",
+										"value": {
+											"value": "@{item().BlobName}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
 					}
 				],
+				"variables": {
+					"blobPath": {
+						"type": "String"
+					},
+					"blobName": {
+						"type": "String"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
