@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "iomegadatafactory"
 		},
+		"AzureSQLConnection_connectionString": {
+			"value": ""
+		},
 		"AzureKVConnection_properties_typeProperties_baseUrl": {
 			"value": "https://iomegakv.vault.azure.net/"
 		},
