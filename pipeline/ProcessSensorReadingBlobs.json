@@ -189,6 +189,88 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "Prepare DLS Path",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set Blob Name",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "dlsPath",
+								"value": {
+									"value": "@concat('/regions/india/', formatDateTime(utcnow(), 'yyyy/MM/dd/hh/mm/ss'))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Copy the Content to DLS",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Prepare DLS Path",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BlobSource",
+									"recursive": false
+								},
+								"sink": {
+									"type": "AzureBlobFSSink"
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "SensorReadingsBlobDataset",
+									"type": "DatasetReference",
+									"parameters": {
+										"blobPath": {
+											"value": "@variables('blobPath')",
+											"type": "Expression"
+										},
+										"blobName": {
+											"value": "@variables('blobName')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ProcessedRecordsDLSDataset",
+									"type": "DatasetReference",
+									"parameters": {
+										"dlsPath": {
+											"value": "@variables('dlsPath')",
+											"type": "Expression"
+										},
+										"dlsBlobName": {
+											"value": "@{Item().Name}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					]
 				}
@@ -199,6 +281,9 @@
 				"type": "String"
 			},
 			"blobName": {
+				"type": "String"
+			},
+			"dlsPath": {
 				"type": "String"
 			}
 		},
