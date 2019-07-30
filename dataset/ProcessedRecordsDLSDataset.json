@@ -1,0 +1,32 @@
+{
+	"name": "ProcessedRecordsDLSDataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADLGen2Connection",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"dlsPath": {
+				"type": "string"
+			},
+			"dlsBlobName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureBlobFSFile",
+		"typeProperties": {
+			"format": {
+				"type": "JsonFormat"
+			},
+			"fileName": {
+				"value": "@dataset().dlsBlobName",
+				"type": "Expression"
+			},
+			"folderPath": {
+				"value": "@dataset().dlsPath",
+				"type": "Expression"
+			}
+		}
+	}
+}
