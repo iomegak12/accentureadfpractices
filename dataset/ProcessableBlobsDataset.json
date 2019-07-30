@@ -1,0 +1,12 @@
+{
+	"name": "ProcessableBlobsDataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSQLConnection",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
