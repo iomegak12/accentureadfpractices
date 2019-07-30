@@ -16,9 +16,6 @@
 		"annotations": [],
 		"type": "AzureBlobFSFile",
 		"typeProperties": {
-			"format": {
-				"type": "JsonFormat"
-			},
 			"fileName": {
 				"value": "@dataset().dlsBlobName",
 				"type": "Expression"
