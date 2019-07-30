@@ -7,6 +7,14 @@
 			"metadata": "Data Factory Name",
 			"defaultValue": "iomegadatafactory"
 		},
+		"ADLGen2Connection_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ADLGen2Connection'"
+		},
+		"AzureBlobStorageConnection_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorageConnection'"
+		},
 		"AzureSQLConnection_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSQLConnection'"
@@ -15,13 +23,13 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSQLDWConnection'"
 		},
-		"AzureBlobStorageConnection_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorageConnection'"
-		},
-		"AzureKVConnection_properties_typeProperties_baseUrl": {
+		"ProcessedRecordsDLSDataset_properties_typeProperties_fileName": {
 			"type": "string",
-			"defaultValue": "https://iomegakv.vault.azure.net/"
+			"defaultValue": "@dataset().dlsBlobName"
+		},
+		"ProcessedRecordsDLSDataset_properties_typeProperties_folderPath": {
+			"type": "string",
+			"defaultValue": "@dataset().dlsPath"
 		},
 		"SensorReadingsBlobDataset_properties_typeProperties_fileName": {
 			"type": "string",
@@ -30,6 +38,14 @@
 		"SensorReadingsBlobDataset_properties_typeProperties_folderPath": {
 			"type": "string",
 			"defaultValue": "@dataset().blobPath"
+		},
+		"ADLGen2Connection_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://iomegadls.dfs.core.windows.net"
+		},
+		"AzureKVConnection_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://iomegakv.vault.azure.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -58,6 +74,9 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"ADLGen2Connection_accountKey": {
+						"value": "[parameters('ADLGen2Connection_accountKey')]"
+					},
 					"AzureBlobStorageConnection_connectionString": {
 						"value": "[parameters('AzureBlobStorageConnection_connectionString')]"
 					},
@@ -67,8 +86,17 @@
 					"AzureSQLDWConnection_connectionString": {
 						"value": "[parameters('AzureSQLDWConnection_connectionString')]"
 					},
+					"ADLGen2Connection_properties_typeProperties_url": {
+						"value": "[parameters('ADLGen2Connection_properties_typeProperties_url')]"
+					},
 					"AzureKVConnection_properties_typeProperties_baseUrl": {
 						"value": "[parameters('AzureKVConnection_properties_typeProperties_baseUrl')]"
+					},
+					"ProcessedRecordsDLSDataset_properties_typeProperties_fileName": {
+						"value": "[parameters('ProcessedRecordsDLSDataset_properties_typeProperties_fileName')]"
+					},
+					"ProcessedRecordsDLSDataset_properties_typeProperties_folderPath": {
+						"value": "[parameters('ProcessedRecordsDLSDataset_properties_typeProperties_folderPath')]"
 					},
 					"SensorReadingsBlobDataset_properties_typeProperties_fileName": {
 						"value": "[parameters('SensorReadingsBlobDataset_properties_typeProperties_fileName')]"

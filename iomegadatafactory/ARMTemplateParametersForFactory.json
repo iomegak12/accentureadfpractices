@@ -5,23 +5,35 @@
 		"factoryName": {
 			"value": "iomegadatafactory"
 		},
+		"ADLGen2Connection_accountKey": {
+			"value": ""
+		},
+		"AzureBlobStorageConnection_connectionString": {
+			"value": ""
+		},
 		"AzureSQLConnection_connectionString": {
 			"value": ""
 		},
 		"AzureSQLDWConnection_connectionString": {
 			"value": ""
 		},
-		"AzureBlobStorageConnection_connectionString": {
-			"value": ""
+		"ProcessedRecordsDLSDataset_properties_typeProperties_fileName": {
+			"value": "@dataset().dlsBlobName"
 		},
-		"AzureKVConnection_properties_typeProperties_baseUrl": {
-			"value": "https://iomegakv.vault.azure.net/"
+		"ProcessedRecordsDLSDataset_properties_typeProperties_folderPath": {
+			"value": "@dataset().dlsPath"
 		},
 		"SensorReadingsBlobDataset_properties_typeProperties_fileName": {
 			"value": "@dataset().blobName"
 		},
 		"SensorReadingsBlobDataset_properties_typeProperties_folderPath": {
 			"value": "@dataset().blobPath"
+		},
+		"ADLGen2Connection_properties_typeProperties_url": {
+			"value": "https://iomegadls.dfs.core.windows.net"
+		},
+		"AzureKVConnection_properties_typeProperties_baseUrl": {
+			"value": "https://iomegakv.vault.azure.net/"
 		}
 	}
 }
